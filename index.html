@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caesar Cipher</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: 
+        0 4px 24px rgba(0, 0, 0, 0.3),
+        0 0 80px rgba(99, 102, 241, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 1.5rem;
+      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.35);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 0.375rem;
+    }
+
+    .field {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      resize: none;
+      transition: all 0.2s ease;
+    }
+
+    textarea::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: rgba(99, 102, 241, 0.5);
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .output {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      min-height: 100px;
+      font-size: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #a78bfa;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .output.empty {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .shift-container {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .shift-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .shift-label {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.875rem;
+    }
+
+    .shift-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #818cf8;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    input[type="range"]::-moz-range-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      height: 8px;
+    }
+
+    .wheel-section {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .wheel-title {
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .wheel-container {
+      display: flex;
+      justify-content: center;
+      overflow: visible;
+    }
+
+    .wheel-svg {
+      overflow: visible;
+      display: block;
+    }
+
+    .wheel-caption {
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.3);
+      margin-top: 0.75rem;
+    }
+
+    #innerRing {
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: 160px 160px;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 1.75rem;
+        border-radius: 20px;
+      }
+      
+      .wheel-svg {
+        width: 260px;
+        height: 260px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="logo">🔐</div>
+        <h1>Caesar Cipher</h1>
+        <p class="subtitle">Shift letters, encrypt messages</p>
+      </div>
+
+      <div class="field">
+        <label>Shift Amount</label>
+        <div class="shift-container">
+          <div class="shift-header">
+            <span class="shift-label">Positions</span>
+            <span class="shift-value" id="shiftValue">3</span>
+          </div>
+          <input type="range" id="shift" min="1" max="25" value="3">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Plaintext</label>
+        <textarea id="input" placeholder="Type your secret message..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Ciphertext</label>
+        <div class="output empty" id="output">Encrypted text appears here...</div>
+      </div>
+
+      <div class="wheel-section">
+        <p class="wheel-title">Cipher Wheel</p>
+        <div class="wheel-container">
+          <svg class="wheel-svg" width="320" height="320" viewBox="0 0 320 320" id="wheel">
+            <!-- Will be populated by JS on load -->
+          </svg>
+        </div>
+        <p class="wheel-caption">Outer: Plaintext · Inner: Ciphertext</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var inputEl = document.getElementById('input');
+    var outputEl = document.getElementById('output');
+    var shiftEl = document.getElementById('shift');
+    var shiftValueEl = document.getElementById('shiftValue');
+    var wheelEl = document.getElementById('wheel');
+
+    var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var centerX = 160;
+    var centerY = 160;
+    var outerRadius = 130;
+    var innerRadius = 95;
+
+    function encrypt(text, shift) {
+      return text.split('').map(function(char) {
+        if (char >= 'a' && char <= 'z') {
+          return String.fromCharCode(((char.charCodeAt(0) - 97 + shift) % 26) + 97);
+        }
+        if (char >= 'A' && char <= 'Z') {
+          return String.fromCharCode(((char.charCodeAt(0) - 65 + shift) % 26) + 65);
+        }
+        return char;
+      }).join('');
+    }
+
+    // Build wheel once on page load
+    function buildWheel() {
+      var svg = '';
+      var i, angle, x, y, x1, y1, x2, y2, letter, rotation;
+      
+      // Outer ring background
+      svg += '<circle cx="' + centerX + '" cy="' + centerY + '" r="' + (outerRadius + 14) + '" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="28"/>';
+      
+      // Outer ring segment lines
+      for (i = 0; i < 26; i++) {
+        angle = (i * 360 / 26 - 90 + 360/52) * (Math.PI / 180);
+        x1 = centerX + (outerRadius - 1) * Math.cos(angle);
+        y1 = centerY + (outerRadius - 1) * Math.sin(angle);
+        x2 = centerX + (outerRadius + 27) * Math.cos(angle);
+        y2 = centerY + (outerRadius + 27) * Math.sin(angle);
+        svg += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>';
+      }
+      
+      // Outer letters (plaintext - fixed)
+      for (i = 0; i < 26; i++) {
+        letter = alphabet[i];
+        angle = (i * 360 / 26 - 90) * (Math.PI / 180);
+        x = centerX + outerRadius * Math.cos(angle);
+        y = centerY + outerRadius * Math.sin(angle);
+        rotation = i * 360 / 26;
+        svg += '<text x="' + x + '" y="' + y + '" fill="rgba(255,255,255,0.6)" font-size="12" font-family="JetBrains Mono, monospace" font-weight="500" text-anchor="middle" dominant-baseline="central" transform="rotate(' + rotation + ', ' + x + ', ' + y + ')">' + letter + '</text>';
+      }
+      
+      // Inner ring background
+      svg += '<circle cx="' + centerX + '" cy="' + centerY + '" r="' + (innerRadius + 12) + '" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="24"/>';
+      
+      // Inner rotating group - starts at 0, will be animated via JS
+      svg += '<g id="innerRing">';
+      
+      // Inner ring segment lines
+      for (i = 0; i < 26; i++) {
+        angle = (i * 360 / 26 - 90 + 360/52) * (Math.PI / 180);
+        x1 = centerX + (innerRadius - 11) * Math.cos(angle);
+        y1 = centerY + (innerRadius - 11) * Math.sin(angle);
+        x2 = centerX + (innerRadius + 23) * Math.cos(angle);
+        y2 = centerY + (innerRadius + 23) * Math.sin(angle);
+        svg += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="rgba(99,102,241,0.2)" stroke-width="1"/>';
+      }
+      
+      // Inner letters (ciphertext - rotates)
+      for (i = 0; i < 26; i++) {
+        letter = alphabet[i];
+        angle = (i * 360 / 26 - 90) * (Math.PI / 180);
+        x = centerX + innerRadius * Math.cos(angle);
+        y = centerY + innerRadius * Math.sin(angle);
+        rotation = i * 360 / 26;
+        svg += '<text x="' + x + '" y="' + y + '" fill="#818cf8" font-size="11" font-family="JetBrains Mono, monospace" font-weight="600" text-anchor="middle" dominant-baseline="central" transform="rotate(' + rotation + ', ' + x + ', ' + y + ')">' + letter + '</text>';
+      }
+      
+      svg += '</g>';
+      
+      // Center dot
+      svg += '<circle cx="' + centerX + '" cy="' + centerY + '" r="8" fill="#6366f1"/>';
+      svg += '<circle cx="' + centerX + '" cy="' + centerY + '" r="4" fill="#1e1b4b"/>';
+      
+      wheelEl.innerHTML = svg;
+    }
+
+    // Only update rotation - let CSS handle the animation
+    function rotateWheel(shift) {
+      var innerRing = document.getElementById('innerRing');
+      var rotation = -shift * (360 / 26);
+      innerRing.style.transform = 'rotate(' + rotation + 'deg)';
+    }
+
+    function update() {
+      var shift = parseInt(shiftEl.value);
+      shiftValueEl.textContent = shift;
+      
+      var encrypted = encrypt(inputEl.value, shift);
+      
+      if (inputEl.value === '') {
+        outputEl.textContent = 'Encrypted text appears here...';
+        outputEl.classList.add('empty');
+      } else {
+        outputEl.textContent = encrypted;
+        outputEl.classList.remove('empty');
+      }
+      
+      rotateWheel(shift);
+    }
+
+    // Build wheel once
+    buildWheel();
+
+    // Set initial rotation
+    rotateWheel(3);
+
+    inputEl.addEventListener('input', update);
+    shiftEl.addEventListener('input', update);
+
+    update();
+  </script>
+</body>
+</html>
